@@ -1,19 +1,30 @@
-const http = require('http');
-const cors = require('cors');
-const express = require('express');
-//const fetch = require('node-fetch');
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+var documents = {};
+//Main Body
+app.set('view engine', 'ejs');
+app.use(session({
+    userid: "session",  
+    keys: [SECRETKEY],
+}));
 
-const app = express();
-const APIKEY = "a7c72d079421cc614e5e08f79663f1f2";  //signup at api.openweathermap.org and obtain an API Key
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
-var options = {
-    host: 'api.openweathermap.org',
-    port: 80,
-    path: '/data/2.5/weather?q=Tokyo,jp&units=metric',
-    method: 'GET'
-};
+const createDocument = function(db, createddocuments, callback){
+    const client = new MongoClient(mongourl);
+    client.connect(function(err) {
+        assert.equal(null, err);
+        console.log("Connected successfully to the MongoDB database server.");
+        const db = client.db(dbName);
 
+        db.collection('restaurants').insertOne(createddocuments, function(error, results){
+            if(error){
+            	throw error
+            };
+            console.log(results);
+            return callback();
+        });
+    });
+}
 app.use(cors());
 
 app.set('view engine', 'ejs');
